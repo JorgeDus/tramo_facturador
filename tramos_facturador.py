@@ -4,7 +4,7 @@ import glob
 import io
 
 # Buscar todos los archivos Parquet divididos
-file_paths = sorted(glob.glob("tramo_facturador_part_*.parquet"))
+file_paths = sorted(glob.glob("data/tramo_facturador_part_*.parquet"))
 
 # Cargar y unir todos los fragmentos en un solo DataFrame
 @st.cache_data
