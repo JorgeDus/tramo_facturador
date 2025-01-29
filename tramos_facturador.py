@@ -1,16 +1,18 @@
 import pandas as pd
 import streamlit as st
+import glob
 
-# Ruta del archivo con los datos ya generados
-FILE_PATH = "tramo_facturador_2024.csv"
+# Buscar todos los archivos Parquet divididos
+file_paths = sorted(glob.glob("tramo_facturador_part_*.parquet"))
 
-# Función para cargar los datos desde el archivo CSV
+# Cargar y unir todos los fragmentos en un solo DataFrame
 def load_data():
     try:
-        data = pd.read_csv(FILE_PATH)
+        data_parts = [pd.read_parquet(file) for file in file_paths]
+        data = pd.concat(data_parts, ignore_index=True)
         return data
     except Exception as e:
-        st.error(f"Error al cargar el archivo: {e}")
+        st.error(f"Error al cargar los archivos: {e}")
         return None
 
 # Función para buscar información por RUT
@@ -19,7 +21,7 @@ def search_by_rut(data, rut_value):
     if not result.empty:
         return result[['RUT', 'Razón social', 'Tramo según ventas', 'Facturador']]
     else:
-        return "Rut no encontrado. Asegúrate de que el formato sea el correcto."
+        return "RUT no encontrado. Asegúrate de que el formato sea el correcto."
 
 # Interfaz en Streamlit
 st.title("Buscador Tramo según Ventas y Tipo de Facturador")
@@ -37,3 +39,4 @@ if data is not None:
             st.write(result)
         except ValueError:
             st.error("Formato inválido")
+
